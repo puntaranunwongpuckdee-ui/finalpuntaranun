@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="วงจรคู่ห้า">
+<meta name="theme-color" content="#0b1030">
+<title>วงจรคู่ห้า</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Sarabun:wght@400;600;700&family=Noto+Serif+Thai:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070a1e;--ink:#f6ecc8;--card:#161d44;--line:#3a4585;--gold:#d4af37;--gold2:#f6e3a1;--dim:#a9b3dc;--serif:"Playfair Display","Noto Serif Thai",Georgia,serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scrollbar-color:#b8902f #0a0e2a}
+::-webkit-scrollbar{width:12px}::-webkit-scrollbar-track{background:#0a0e2a}
+::-webkit-scrollbar-thumb{background:linear-gradient(#f6e3a1,#b8902f);border-radius:8px;border:2px solid #0a0e2a}
+::selection{background:#d4af37;color:#1d2247}
+body{margin:0;min-height:100vh;color:var(--ink);background:#070a1e;font:17px/1.55 "Sarabun","Noto Sans Thai","Leelawadee UI",system-ui,sans-serif;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:5;pointer-events:none;box-shadow:inset 0 0 200px rgba(0,0,0,.75)}
+
+/* ฉากหลังอวกาศ ดาวเลื่อนช้า ๆ */
+#bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 18% 0,rgba(60,80,200,.38),transparent 55%),radial-gradient(ellipse at 88% 100%,rgba(130,50,130,.38),transparent 55%),linear-gradient(#0a0f33,#05071a)}
+#bg i{position:absolute;inset:0;background-repeat:repeat}
+#bg i:nth-child(1){background-image:radial-gradient(1.5px 1.5px at 30px 40px,#fff,transparent),radial-gradient(1px 1px at 110px 90px,#ffe9a8,transparent),radial-gradient(1.5px 1.5px at 170px 150px,#fff,transparent);background-size:200px 200px;animation:drift 90s linear infinite,twinkle 4s ease-in-out infinite}
+#bg i:nth-child(2){background-image:radial-gradient(2px 2px at 60px 70px,#fff,transparent),radial-gradient(1.5px 1.5px at 200px 210px,#cfe0ff,transparent),radial-gradient(2px 2px at 250px 120px,#ffe9a8,transparent);background-size:310px 310px;animation:drift 150s linear infinite,twinkle 6s ease-in-out -2s infinite}
+#bg i:nth-child(3){background-image:radial-gradient(3px 3px at 70px 60px,rgba(212,175,55,.75),transparent),radial-gradient(2.5px 2.5px at 190px 180px,rgba(246,227,161,.6),transparent);background-size:280px 280px;animation:drift 60s linear infinite}
+@keyframes drift{to{background-position:0 600px}}
+@keyframes twinkle{50%{opacity:.45}}
+
+/* ===== จอเปิดเกม ===== */
+#title{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px;overflow:hidden;background:radial-gradient(ellipse at 50% 32%,rgba(74,92,196,.6),transparent 60%),radial-gradient(ellipse at 50% 105%,rgba(130,50,130,.55),transparent 55%),linear-gradient(#0b1136,#04061a);transition:opacity .6s,transform .8s}
+#title.out{opacity:0;transform:scale(1.3);pointer-events:none}
+.crest{font-size:5.5rem;line-height:1;filter:drop-shadow(0 0 24px rgba(255,210,90,.85));animation:crest 3.2s ease-in-out infinite;position:relative}
+@keyframes crest{50%{transform:translateY(-12px) rotate(4deg) scale(1.06)}}
+#title h1{margin:0;font-family:var(--serif);font-weight:800;font-size:clamp(2.8rem,12vw,5.4rem);letter-spacing:.05em;background:linear-gradient(90deg,#f6e3a1,#c9a227,#fff4c8,#c9a227,#f6e3a1);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #7a5a12) drop-shadow(0 4px 0 #5c4209) drop-shadow(0 6px 0 #4d3705) drop-shadow(0 14px 14px rgba(0,0,0,.6));animation:shine 6s linear infinite,bob 3.6s ease-in-out infinite;position:relative}
+@keyframes shine{to{background-position:200% 0}}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.tag{margin:6px 0 0;letter-spacing:.22em;color:#e5d9a8;font-size:.9rem;text-transform:uppercase;position:relative}
+.cta{font-size:1.6rem;padding:14px 48px;border-radius:999px;margin-top:26px;position:relative;animation:cta 1.6s ease-in-out infinite}
+@keyframes cta{50%{transform:scale(1.07)}}
+.cta:active{animation:none}
+.hint{margin:14px 0 0;color:var(--dim);font-size:.9rem;position:relative;animation:blink 1.8s ease-in-out infinite}
+@keyframes blink{50%{opacity:.35}}
+.note{position:absolute;bottom:-30px;color:#f0d27a;pointer-events:none;opacity:0;text-shadow:0 2px 0 rgba(0,0,0,.4);animation:noteUp var(--d,7s) linear infinite}
+@keyframes noteUp{0%{transform:translateY(0) translateX(0) rotate(-10deg) scale(.8);opacity:0}15%{opacity:.8}50%{transform:translateY(-45vh) translateX(18px) rotate(12deg) scale(1)}100%{transform:translateY(-95vh) translateX(-14px) rotate(-8deg) scale(1.1);opacity:0}}
+
+/* ===== HUD ===== */
+#hud{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(#18205a,#0b1030);border-bottom:3px solid var(--gold);box-shadow:0 4px 0 #5a4210,0 12px 24px rgba(0,0,0,.55)}
+body[data-screen="menu"] #home,body[data-screen="title"] #home{display:none}
+#home{padding:7px 14px;white-space:nowrap}
+#rank{flex:1;display:flex;align-items:center;gap:10px;max-width:560px;margin-left:auto;min-width:0}
+.emb{flex:none;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font-size:1.55rem;background:radial-gradient(circle at 35% 30%,#fff2b8,#d4af37 55%,#7a5a12);border:2px solid #fff3c4;box-shadow:0 3px 0 #5a4210,0 0 16px rgba(212,175,55,.6)}
+.rk{flex:1;min-width:0}
+.rn{display:flex;justify-content:space-between;gap:8px;font-size:.95rem;line-height:1.2}
+.rn span{color:#ffe08a;font-weight:700;white-space:nowrap}
+.rk small{font-size:.78rem}
+.stk{flex:none;display:flex;align-items:center;gap:3px;padding:4px 11px;border-radius:99px;background:#2a1020;border:2px solid #e8801a;color:#ffd08a;font-weight:700;box-shadow:0 0 12px rgba(232,128,26,.45);animation:glowq 2.4s ease-in-out infinite}
+.bar{height:12px;margin:4px 0 2px;background:#0a0e2a;border:2px solid #7a5a12;border-radius:99px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.7)}
+.bar i{display:block;height:100%;position:relative;overflow:hidden;background:linear-gradient(90deg,#b8902f,#f6e3a1 50%,#c9a227);transition:width .4s;box-shadow:0 0 10px rgba(246,227,161,.7)}
+.bar i::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.7),transparent);transform:translateX(-100%);animation:shim 2s linear infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+
+main{position:relative;z-index:2;max-width:1000px;margin:0 auto;padding:112px 14px 40px;perspective:1400px}
+
+/* ===== ปุ่มเกม ===== */
+button{font:inherit;font-weight:600;color:var(--ink);cursor:pointer;border-radius:12px;padding:8px 18px;border:2px solid #b8902f;background:linear-gradient(#2a3578,#161d4a);box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 5px 0 #5a4210,0 9px 12px rgba(0,0,0,.45);text-shadow:0 1px 0 rgba(0,0,0,.6);transition:transform .08s,box-shadow .08s,filter .15s}
+button:hover:not(:disabled){filter:brightness(1.18)}
+button:active:not(:disabled){transform:translateY(5px);box-shadow:inset 0 2px 0 rgba(255,255,255,.1),0 0 0 #5a4210,0 2px 4px rgba(0,0,0,.5)}
+button:disabled{cursor:default}
+button.go,.cta{color:#2a1d00;text-shadow:0 1px 0 rgba(255,255,255,.5);background:linear-gradient(#fff2b8,#e0b83c 55%,#b8902f);border-color:#fff3c4;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),0 5px 0 #7a5a12,0 9px 14px rgba(0,0,0,.5),0 0 18px rgba(212,175,55,.35)}
+button:focus-visible,.seg:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #6fd3ff;outline-offset:2px}
+button.go:not(:disabled):not(.cta){animation:beat 2.4s ease-in-out infinite}
+button.go:active:not(:disabled){animation:none}
+@keyframes beat{50%{transform:translateY(-2px)}}
+
+/* ===== แผง ===== */
+.card{position:relative;margin-bottom:20px;padding:20px;border-radius:16px;background:linear-gradient(160deg,rgba(32,44,106,.94),rgba(12,17,48,.96));border:2px solid #b8902f;box-shadow:inset 0 0 0 3px rgba(0,0,0,.35),inset 0 0 40px rgba(212,175,55,.1),0 6px 0 #5a4210,0 20px 34px rgba(0,0,0,.55)}
+.card::before{content:'';position:absolute;inset:7px;border-radius:10px;pointer-events:none;background:linear-gradient(var(--gold),var(--gold)) 0 0/20px 3px,linear-gradient(var(--gold),var(--gold)) 0 0/3px 20px,linear-gradient(var(--gold),var(--gold)) 100% 0/20px 3px,linear-gradient(var(--gold),var(--gold)) 100% 0/3px 20px,linear-gradient(var(--gold),var(--gold)) 0 100%/20px 3px,linear-gradient(var(--gold),var(--gold)) 0 100%/3px 20px,linear-gradient(var(--gold),var(--gold)) 100% 100%/20px 3px,linear-gradient(var(--gold),var(--gold)) 100% 100%/3px 20px;background-repeat:no-repeat}
+h1,h2,h3{font-family:var(--serif)}
+h2{margin:0 0 8px;font-size:1.5rem;color:#ffe9a0;text-shadow:0 2px 0 #5a4210}
+h3{margin:14px 0 6px;font-size:1.1rem;color:#ffe9a0}
+small{font-weight:400;color:var(--dim);font-size:1rem}
+label{display:block;margin:10px 0 4px;font-weight:600;color:#ffe9a0}
+input,select{width:100%;font:inherit;padding:9px 12px;border-radius:10px;border:2px solid var(--line);background:#0a0e2a;color:var(--ink);box-shadow:inset 0 3px 6px rgba(0,0,0,.6)}
+input[type=range]{padding:0;box-shadow:none;accent-color:#d4af37}
+input:focus,select:focus{outline:none;border-color:#d4af37;box-shadow:inset 0 3px 6px rgba(0,0,0,.5),0 0 0 3px rgba(212,175,55,.35)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.acc{font-size:1.25rem;font-weight:700;color:#ffe08a;margin:4px 0}
+.phrase{min-height:1.6em;color:var(--dim);font-style:italic}
+.staff{width:100%;max-width:330px;display:block;color:var(--ink);filter:drop-shadow(0 2px 0 rgba(0,0,0,.4))}
+.chords{display:flex;gap:8px;flex-wrap:wrap}
+.score{display:inline-block;font-family:var(--serif);font-size:3.2rem;font-weight:800;color:#ffe08a;text-shadow:0 3px 0 #7a5a12,0 0 24px rgba(255,210,90,.6);animation:scoreIn .7s cubic-bezier(.2,1.6,.4,1) backwards}
+@keyframes scoreIn{from{opacity:0;transform:perspective(500px) rotateY(180deg) scale(.3)}}
+#toast{min-height:1.6em;color:#6fe3a0;font-weight:600}
+
+/* ===== เมนูเลือกโหมด ===== */
+.stage-title{text-align:center;margin:28px 0 16px;font-size:1.25rem;letter-spacing:.16em;text-transform:uppercase}
+.stage-title::before,.stage-title::after{content:'';display:inline-block;width:44px;height:2px;margin:0 12px;vertical-align:middle;background:linear-gradient(90deg,transparent,var(--gold))}
+.stage-title::after{transform:scaleX(-1)}
+.quest{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:16px;background:linear-gradient(90deg,#4a2a6b,#2b1f5c 60%,#1b2565);border:2px solid var(--gold);box-shadow:inset 0 0 0 3px rgba(0,0,0,.3),0 6px 0 #5a4210,0 16px 26px rgba(0,0,0,.5);animation:glowq 2.6s ease-in-out infinite,flipIn .6s backwards}
+.quest .qi{font-size:2.5rem;animation:crest 3s ease-in-out infinite}
+.quest>div:nth-child(2){flex:1;min-width:0}
+.quest b{display:block;color:#ffe9a0;letter-spacing:.05em}
+.quest span{color:var(--dim)}
+@keyframes glowq{50%{box-shadow:inset 0 0 0 3px rgba(0,0,0,.3),0 6px 0 #5a4210,0 16px 26px rgba(0,0,0,.5),0 0 28px rgba(212,175,55,.5)}}
+#tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:820px){#tiles{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){#tiles{grid-template-columns:1fr}.cta{padding:12px 34px}}
+.tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:5px;text-align:left;min-height:200px;padding:18px;border-radius:22px;overflow:hidden;color:#fff;border:3px solid rgba(255,255,255,.6);background:linear-gradient(150deg,var(--c1),var(--c2));box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -6px 0 rgba(0,0,0,.25),0 8px 0 var(--c3),0 20px 28px rgba(0,0,0,.5);animation:tileIn .6s cubic-bezier(.2,1.4,.4,1) backwards;animation-delay:calc(var(--i)*.08s);transition:transform .15s,filter .15s,box-shadow .1s}
+.tile:hover:not(:disabled){transform:translateY(-7px) rotate(-.7deg);filter:brightness(1.12)}
+.tile:active:not(:disabled){transform:translateY(8px);box-shadow:inset 0 3px 0 rgba(255,255,255,.3),inset 0 -6px 0 rgba(0,0,0,.25),0 0 0 var(--c3),0 4px 8px rgba(0,0,0,.5)}
+@keyframes tileIn{from{opacity:0;transform:translateY(50px) rotateX(-40deg) scale(.85)}}
+.tile::after{content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;pointer-events:none;background:linear-gradient(105deg,transparent,rgba(255,255,255,.38),transparent);transform:skewX(-20deg);animation:tsh 4.6s ease-in-out infinite;animation-delay:calc(var(--i)*.6s)}
+@keyframes tsh{0%,60%{left:-60%}100%{left:130%}}
+.tile .ic{position:absolute;right:10px;bottom:8px;font-size:5.4rem;line-height:1;filter:drop-shadow(0 8px 6px rgba(0,0,0,.45));animation:icf 3.4s ease-in-out infinite;animation-delay:calc(var(--i)*-.5s)}
+@keyframes icf{50%{transform:translateY(-9px) rotate(6deg)}}
+.tile .tg{font-size:.68rem;letter-spacing:.18em;padding:2px 10px;border-radius:99px;background:rgba(255,255,255,.24);font-weight:700}
+.tile b{font-family:var(--serif);font-size:1.4rem;text-shadow:0 2px 0 rgba(0,0,0,.4);max-width:72%;line-height:1.25}
+.tile em{font-style:normal;font-size:.9rem;max-width:64%;line-height:1.35;text-shadow:0 1px 0 rgba(0,0,0,.45)}
+.tile small{margin-top:auto;padding:3px 11px;border-radius:99px;background:rgba(0,0,0,.4);color:#ffe9a0;font-size:.82rem;position:relative;z-index:1}
+.tile small:empty{display:none}
+.t-explore{--c1:#2f7bd6;--c2:#164a9a;--c3:#0c2a5e}
+.t-quiz{--c1:#e0475a;--c2:#a31f3a;--c3:#5c0f20}
+.t-race{--c1:#f5a524;--c2:#d0561a;--c3:#6e2c0a}
+.t-build{--c1:#34c07a;--c2:#12805a;--c3:#07442f}
+.t-treasure{--c1:#e8c34a;--c2:#a47e22;--c3:#5a4210}
+.t-settings{--c1:#6c7aa8;--c2:#3b4670;--c3:#1c2240}
+
+/* ===== เลือกด่าน / คำถาม ===== */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+.opts button{border-radius:16px;padding:14px;font-size:1.15rem;animation:optIn .45s cubic-bezier(.2,1.4,.4,1) backwards}
+.opts button:nth-child(2){animation-delay:.07s}.opts button:nth-child(3){animation-delay:.14s}.opts button:nth-child(4){animation-delay:.21s}
+@keyframes optIn{from{opacity:0;transform:translateY(24px) rotateX(-50deg) scale(.9)}}
+.opts .ok{background:linear-gradient(#3fcf86,#1c8a4e);border-color:#caffdf;color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 5px 0 #0f5c33,0 9px 12px rgba(0,0,0,.45);animation:pop .35s}
+.opts .bad{background:linear-gradient(#ee6a6a,#c43b3b);border-color:#ffd0d0;color:#fff;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 5px 0 #7e1f1f,0 9px 12px rgba(0,0,0,.45);animation:shake .35s}
+@keyframes pop{50%{transform:scale(1.08)}}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.opts.lv{grid-template-columns:repeat(3,1fr)}
+.lv button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:18px 8px;font-size:1.2rem}
+.lv .st{color:#ffe08a;letter-spacing:.15em;font-size:1.1rem;text-shadow:0 0 10px rgba(255,210,90,.8)}
+.lv button:nth-child(1){background:linear-gradient(#3fcf86,#1c8a4e);border-color:#caffdf;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 5px 0 #0f5c33,0 9px 12px rgba(0,0,0,.45)}
+.lv button:nth-child(2){background:linear-gradient(#ffc24d,#d0861a);border-color:#fff0c4;color:#3a2400;box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 5px 0 #7a4a08,0 9px 12px rgba(0,0,0,.45)}
+.lv button:nth-child(2) .st{color:#fff}
+.lv button:nth-child(3){background:linear-gradient(#ee6a6a,#b8283a);border-color:#ffd0d0;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 5px 0 #6e1426,0 9px 12px rgba(0,0,0,.45)}
+.ps .opts,.ps .staff,.ps h2{visibility:hidden}
+
+/* ===== ห้องสมบัติ ===== */
+.medals{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
+.medal{padding:14px 10px;border-radius:14px;text-align:center;background:rgba(0,0,0,.38);border:2px solid var(--line);filter:grayscale(1);opacity:.7}
+.medal span{display:block;font-size:2.6rem;line-height:1.2}
+.medal b{display:block;color:#ffe9a0}
+.medal small{display:block;line-height:1.3;font-size:.85rem}
+.medal.got{filter:none;opacity:1;border-color:var(--gold);background:linear-gradient(160deg,rgba(212,175,55,.3),rgba(0,0,0,.3));animation:glowm 3s ease-in-out infinite}
+@keyframes glowm{50%{box-shadow:0 0 22px rgba(212,175,55,.55)}}
+
+/* ===== ฉากสำรวจ: วงจรคู่ห้า 3 มิติ ===== */
+.daily{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+@media(max-width:760px){.wrap{grid-template-columns:1fr}}
+.wrap>.card:first-child{background:radial-gradient(circle at 50% 55%,rgba(212,175,55,.26),transparent 62%),linear-gradient(160deg,rgba(32,44,106,.94),rgba(12,17,48,.96));animation:flipIn .7s backwards,floaty 6s ease-in-out .7s infinite}
+@keyframes floaty{50%{transform:translateY(-7px)}}
+section:not([hidden]) .card{transform-origin:50% 0;animation:flipIn .55s cubic-bezier(.2,.9,.3,1.1) backwards}
+section:not([hidden]) .card:nth-child(2){animation-delay:.08s}
+section:not([hidden]) .card:nth-child(3){animation-delay:.16s}
+@keyframes flipIn{from{opacity:0;transform:perspective(900px) rotateX(-70deg) translateY(-24px)}}
+:root{--rx:16deg;--ry:0deg}
+#circle{width:100%;height:auto;max-width:440px;margin:auto;display:block;transform:perspective(900px) rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .2s ease-out;filter:drop-shadow(0 24px 14px rgba(0,0,0,.6))}
+#circle.tilting{transition:none}
+.seg path{stroke:rgba(255,246,210,.95);stroke-width:2.5;cursor:pointer;transition:transform .18s,filter .18s;transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5)) drop-shadow(0 6px 0 rgba(0,0,0,.25))}
+.seg[data-r="min"] path{stroke:#d4af37;stroke-width:1.6}
+.seg text{pointer-events:none;text-anchor:middle;dominant-baseline:central;fill:#14192e;font-family:var(--serif);font-weight:700;transition:transform .18s;transform-box:fill-box;transform-origin:center}
+.seg[data-r="min"] text{fill:#fff3cf}
+.seg:hover path{transform:translateY(-3px);filter:drop-shadow(0 6px 0 rgba(0,0,0,.5)) drop-shadow(0 10px 5px rgba(0,0,0,.3)) brightness(1.1)}
+.seg.on path{transform:translateY(-8px);stroke:#fff;stroke-width:4;animation:onGlow 1.8s ease-in-out infinite;filter:drop-shadow(0 8px 0 rgba(0,0,0,.55)) drop-shadow(0 14px 8px rgba(0,0,0,.4)) saturate(1.35)}
+@keyframes onGlow{50%{filter:drop-shadow(0 8px 0 rgba(0,0,0,.55)) drop-shadow(0 14px 8px rgba(0,0,0,.4)) drop-shadow(0 0 16px #ffd34d) saturate(1.5)}}
+.seg.on text{font-size:1.15em;transform:translateY(-8px)}
+.seg.nb path{transform:translateY(-4px);stroke:#ffd34d;stroke-width:4;stroke-dasharray:6 4}
+.seg:active path{transform:translateY(0)}
+#circle.intro .seg path{animation:wedgeIn .65s cubic-bezier(.2,1.5,.4,1) backwards}
+@keyframes wedgeIn{from{transform:translateY(-60px) scale(.4) rotate(-25deg);opacity:0}}
+.disc{fill:url(#discg);stroke:#b8902f;stroke-width:5;filter:drop-shadow(0 4px 0 rgba(0,0,0,.4)) drop-shadow(0 8px 6px rgba(0,0,0,.3))}
+.mid{text-anchor:middle;dominant-baseline:central;font-size:34px;font-weight:700;font-family:var(--serif);fill:var(--ink);animation:midPulse 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes midPulse{50%{transform:scale(1.07)}}
+.gloss,.rim{pointer-events:none}.rim{fill:none}
+.ring{fill:none;stroke:#d4af37;stroke-width:3;stroke-dasharray:3 9;stroke-linecap:round;transform-box:fill-box;transform-origin:center;animation:spin 14s linear infinite;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.swp{animation:sweep 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes sweep{0%{transform:translateX(0)}55%,100%{transform:translateX(640px)}}
+.blank .seg:not(.placed) text{visibility:hidden}
+
+/* ===== เอฟเฟกต์ ===== */
+.cf{position:fixed;top:-14px;width:10px;height:14px;z-index:90;pointer-events:none;animation:fall 2.6s linear forwards}
+@keyframes fall{to{transform:translateY(108vh) rotate(540deg)}}
+.sp{position:fixed;width:9px;height:9px;border-radius:50%;background:radial-gradient(#fff,#e0b43c);z-index:90;pointer-events:none;animation:spk .7s ease-out forwards}
+@keyframes spk{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.sl{position:fixed;width:150px;height:5px;margin:-2px 0 0 -75px;background:linear-gradient(90deg,transparent,#fff,#ffe08a,transparent);border-radius:3px;transform:rotate(-35deg) scaleX(0);z-index:90;pointer-events:none;animation:slashA .35s ease-out forwards}
+@keyframes slashA{40%{transform:rotate(-35deg) scaleX(1);opacity:1}to{transform:rotate(-35deg) scaleX(1.1);opacity:0}}
+.hit main{animation:shk .35s}
+@keyframes shk{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.hit::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:80;box-shadow:inset 0 0 90px 24px rgba(200,20,40,.7);animation:fadeR .45s forwards}
+@keyframes fadeR{to{opacity:0}}
+#bt{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:120;padding:11px 22px;border-radius:99px;font-weight:700;color:#2a1d00;background:linear-gradient(#fff2b8,#e0b83c);border:2px solid #fff3c4;box-shadow:0 5px 0 #7a5a12,0 12px 20px rgba(0,0,0,.5),0 0 22px rgba(212,175,55,.5);animation:toastIn .4s cubic-bezier(.2,1.5,.4,1)}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(30px) scale(.8)}}
+@media(max-width:520px){#hud{gap:8px;padding:8px 10px}.emb{width:40px;height:40px}.rn{font-size:.85rem}.tile{min-height:170px}.tile .ic{font-size:4.4rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.cf,.sp,.sl,.note{display:none}#circle{transform:perspective(900px) rotateX(10deg)!important}}
+
+/* ===== รองรับมือถือ ===== */
+html{-webkit-text-size-adjust:100%}
+button,.seg,.tile{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+#title{min-height:100vh;min-height:100dvh;padding:calc(20px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-left))}
+#hud{padding-top:calc(9px + env(safe-area-inset-top));padding-left:calc(14px + env(safe-area-inset-left));padding-right:calc(14px + env(safe-area-inset-right))}
+main{padding-top:calc(112px + env(safe-area-inset-top));padding-bottom:calc(40px + env(safe-area-inset-bottom))}
+#bt{bottom:calc(22px + env(safe-area-inset-bottom));max-width:92vw;text-align:center}
+@media(max-width:600px){
+ body{font-size:16px}
+ main{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right));padding-top:calc(98px + env(safe-area-inset-top))}
+ #hud{gap:8px;padding-bottom:8px}
+ #home{padding:7px 10px;font-size:.9rem;min-height:44px}
+ .rn b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .stk{padding:3px 8px}
+ button{min-height:44px}
+ .card{padding:16px 14px;border-radius:14px;margin-bottom:16px}
+ .card::before{inset:5px}
+ h2{font-size:1.3rem}
+ .quest{padding:12px 14px;flex-wrap:wrap}
+ .quest .qi{font-size:2rem}
+ .quest>div:nth-child(2){flex:1 1 60%}
+ .quest button{width:100%}
+ .stage-title{font-size:1.05rem;margin:20px 0 12px}
+ .stage-title::before,.stage-title::after{width:24px;margin:0 8px}
+ #tiles{grid-template-columns:1fr 1fr;gap:12px}
+ .tile{min-height:158px;padding:14px 12px;border-radius:18px;gap:4px}
+ .tile .ic{top:8px;bottom:auto;right:8px;font-size:2.5rem}
+ .tile .tg{font-size:.6rem;padding:2px 8px}
+ .tile b{font-size:1.1rem;max-width:100%;margin-top:4px}
+ .tile em{font-size:.8rem;max-width:100%}
+ .tile small{font-size:.74rem;padding:3px 9px}
+ .wrap{gap:14px}
+ .opts{gap:10px}
+ .opts button{padding:16px 8px;font-size:1.05rem;min-height:58px}
+ .lv button{padding:14px 4px;font-size:1rem}
+ .chords button{flex:1 1 28%}
+ .medals{grid-template-columns:1fr 1fr}
+ .score{font-size:2.6rem}
+ .cta{width:100%;max-width:320px;padding:14px 20px}
+ .row button{flex:1 1 40%}
+ .daily button{width:100%}
+}
+@media(max-width:340px){#tiles{grid-template-columns:1fr}.tile .ic{font-size:2.2rem}}
+@media(max-height:520px) and (orientation:landscape){
+ .crest{font-size:3rem}#title h1{font-size:2.4rem}.cta{margin-top:10px;padding:10px 36px;font-size:1.3rem}.hint{display:none}
+ main{padding-top:calc(84px + env(safe-area-inset-top))}
+}
+/* จอสัมผัส: ไม่มี hover ค้าง และลดเอฟเฟกต์หนักให้ลื่น */
+@media(hover:none){
+ button:hover:not(:disabled){filter:none}
+ .tile:hover:not(:disabled){transform:none;filter:none}
+ .seg:not(.on):not(.nb):hover path{transform:none;filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+}
+@media(pointer:coarse){
+ .seg path{filter:drop-shadow(0 3px 0 rgba(0,0,0,.5))}
+ .seg.on path{filter:drop-shadow(0 8px 0 rgba(0,0,0,.55)) saturate(1.35)}
+ @keyframes onGlow{50%{filter:drop-shadow(0 8px 0 rgba(0,0,0,.55)) drop-shadow(0 0 12px #ffd34d) saturate(1.5)}}
+ #circle{filter:none;--rx:10deg}
+ .wrap>.card:first-child{animation:flipIn .7s backwards}
+ #bg i:nth-child(2){display:none}
+ .tile::after{display:none}
+}
+</style>
+</head>
+<body data-screen="title">
+<div id="bg"><i></i><i></i><i></i></div>
+
+<div id="title">
+ <div class="crest">⚔️</div>
+ <h1>วงจรคู่ห้า</h1>
+ <p class="tag">Circle of Fifths · ศึกแห่งกุญแจเสียง</p>
+ <button id="startBtn" class="cta">▶ เริ่มเกม</button>
+ <p class="hint">แตะเพื่อเข้าสู่ราชสำนัก</p>
+</div>
+
+<div id="hud"><button id="home">☰ เมนู</button><div id="rank"></div></div>
+
+<main>
+ <section id="menu" hidden>
+  <div id="dq" class="quest"></div>
+  <h2 class="stage-title">เลือกโหมดเกม</h2>
+  <div id="tiles"></div>
+ </section>
+
+ <section id="explore" hidden>
+  <div class="card daily" id="daily"></div>
+  <div class="wrap">
+   <div class="card"><svg id="circle" viewBox="0 0 400 400" role="group" aria-label="วงจรคู่ห้า วงนอกเมเจอร์ วงในไมเนอร์"></svg></div>
+   <div class="card" id="info"></div>
+  </div>
+ </section>
+
+ <section id="quiz" hidden><div class="card" id="qBox"></div></section>
+
+ <section id="treasure" hidden>
+  <div class="card" id="badges"></div>
+  <div class="card">
+   <h2>วลีช่วยจำของฉัน</h2>
+   <label for="pS">ลำดับชาร์ป F C G D A E B</label><input id="pS" maxlength="80" placeholder="พิมพ์วลีของตัวเอง">
+   <label for="pF">ลำดับแฟล็ต B E A D G C F</label><input id="pF" maxlength="80" placeholder="พิมพ์วลีของตัวเอง">
+   <p class="row"><button id="pSave" class="go">บันทึกวลี</button><span id="pMsg"></span></p>
+  </div>
+ </section>
+
+ <section id="settings" hidden>
+  <div class="card" id="set"><h2>ตั้งค่า</h2>
+   <label for="clS">กุญแจประจำหลัก</label><select id="clS"><option value="g">กุญแจซอล</option><option value="f">กุญแจฟา</option></select>
+   <label for="vol">ระดับเสียง</label><input id="vol" type="range" min="0" max="100">
+   <p class="row"><button id="rst">ล้างสถิติและเหรียญ</button></p>
+  </div>
+ </section>
+</main>
+<div id="bt" hidden></div>
+<script>
+var SH=['F','C','G','D','A','E','B'],FL=['B','E','A','D','G','C','F'];
+var SS=[8,5,9,6,3,7,4],SF=[4,7,3,6,2,5,1];
+var MAJ=['C♭','G♭','D♭','A♭','E♭','B♭','F','C','G','D','A','E','B','F♯','C♯'];
+var MIN=['A♭m','E♭m','B♭m','Fm','Cm','Gm','Dm','Am','Em','Bm','F♯m','C♯m','G♯m','D♯m','A♯m'];
+var PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function $(i){return document.getElementById(i)}
+function mod(n){return((n%12)+12)%12}
+function nm(a,r){return(r==='maj'?MAJ:MIN)[a+7]}
+function accsAt(p){var r=[];for(var a=7;a>=-7;a--)if(mod(a)===p)r.push(a);return r}
+function lab(a){return a===0?'ไม่มีเครื่องหมาย':(a>0?'♯ '+a+' ตัว':'♭ '+(-a)+' ตัว')}
+function rnd(n){return Math.floor(Math.random()*n)}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch(e){return{}}}
+
+function staff(a){
+ var s='<svg viewBox="0 0 260 120" class="staff" role="img" aria-label="บรรทัดห้าเส้น '+lab(a)+'">',i;
+ for(i=0;i<5;i++)s+='<line x1="8" x2="252" y1="'+(90-i*12)+'" y2="'+(90-i*12)+'" stroke="currentColor"/>';
+ s+='<text x="12" y="104" font-size="62" font-family="\'Noto Music\',\'Segoe UI Symbol\',serif">'+(SET.cl==='f'?'𝄢':'𝄞')+'</text>';
+ var st=SET.cl==='f'?(a>0?[6,3,7,4,1,5,2]:[2,5,1,4,0,3,6]):(a>0?SS:SF),g=a>0?'♯':'♭';
+ for(i=0;i<Math.abs(a);i++)s+='<text x="'+(76+i*24)+'" y="'+(90-st[i]*6)+'" font-size="30" text-anchor="middle" dominant-baseline="central">'+g+'</text>';
+ return s+'</svg>'}
+
+function pt(r,d){var t=(d-90)*Math.PI/180;return[200+r*Math.cos(t),200+r*Math.sin(t)]}
+function wedge(r1,r2,d1,d2){var a=pt(r2,d1),b=pt(r2,d2),c=pt(r1,d2),d=pt(r1,d1);
+ return'M'+a+'A'+r2+','+r2+' 0 0 1 '+b+'L'+c+'A'+r1+','+r1+' 0 0 0 '+d+'Z'}
+var sel={p:0,r:'maj',alt:0};
+function build(){
+ var h='';
+ ['maj','min'].forEach(function(r){
+  var r1=r==='maj'?138:84,r2=r==='maj'?192:132;
+  for(var p=0;p<12;p++){
+   var ks=accsAt(p).map(function(a){return nm(a,r)}),m=pt((r1+r2)/2,p*30);
+   var fill=r==='maj'?(p%2?'#ecd48f':'#f6e7b4'):(p%2?'#7d2f45':'#34457f');
+   h+='<g class="seg" data-p="'+p+'" data-r="'+r+'" tabindex="0" role="button" aria-label="'+ks.join(' หรือ ')+'"><path d="'+wedge(r1,r2,p*30-15,p*30+15)+'" fill="'+fill+'"/><text x="'+m[0]+'" y="'+m[1]+'" font-size="'+(ks.length>1?14:20)+'">'+ks.join('/')+'</text></g>';
+  }});
+ $('circle').innerHTML='<defs><radialGradient id="gl" cx="35%" cy="25%" r="85%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".45" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></radialGradient></defs>'+h+'<circle class="disc" cx="200" cy="200" r="78"/><text id="mid" class="mid" x="200" y="200"></text><circle class="gloss" cx="200" cy="200" r="192" fill="url(#gl)"/>'+
+  '<defs><clipPath id="cpc"><circle cx="200" cy="200" r="192"/></clipPath><linearGradient id="sw" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>'+
+  '<g clip-path="url(#cpc)" pointer-events="none"><g transform="rotate(20 200 200)"><rect class="swp" x="-140" y="-60" width="90" height="520" fill="url(#sw)"/></g></g>'+
+  '<circle class="ring" cx="200" cy="200" r="81"/>'+
+  '<defs><linearGradient id="goldg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c8"/><stop offset=".35" stop-color="#d4af37"/><stop offset=".7" stop-color="#8a6a1c"/><stop offset="1" stop-color="#f6e3a1"/></linearGradient><radialGradient id="discg" cx="50%" cy="35%" r="75%"><stop offset="0" style="stop-color:var(--card)"/><stop offset="1" style="stop-color:var(--line)"/></radialGradient></defs>'+
+  '<circle class="rim" cx="200" cy="200" r="195.5" stroke="url(#goldg)" stroke-width="5"/><circle class="rim" cx="200" cy="200" r="133" stroke="url(#goldg)" stroke-width="2.5"/><circle class="rim" cx="200" cy="200" r="137" stroke="url(#goldg)" stroke-width="1.5" opacity=".7"/>'}
+
+var ac;
+function tone(f,t,d){var o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=f;o.connect(g);g.connect(ac.destination);
+ g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(Math.max(.0002,.3*V),t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.start(t);o.stop(t+d+.05)}
+function play(n,r){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();
+ var root=60+PC[n[0]]+(n[1]==='♯'?1:n[1]==='♭'?-1:0),iv=r==='maj'?[0,2,4,5,7,9,11,12]:[0,2,3,5,7,8,10,12],t=ac.currentTime+.05;
+ iv.forEach(function(x,i){tone(440*Math.pow(2,(root+x-69)/12),t+i*.35,.45)})}catch(e){}}
+
+var LET=['C','D','E','F','G','A','B'];
+function rootOf(n){return 60+PC[n[0]]+(n[1]==='♯'?1:n[1]==='♭'?-1:0)}
+function chord(m){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();var t=ac.currentTime+.05;m.forEach(function(x){tone(440*Math.pow(2,(x-69)/12),t,1.2)})}catch(e){}}
+function ping(n){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();tone(440*Math.pow(2,(rootOf(n)-69)/12),ac.currentTime+.02,.5)}catch(e){}}
+function sfx(ok){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();var t=ac.currentTime+.02;tone(ok?660:180,t,.2);tone(ok?1320:90,t,ok?.12:.35);if(ok)tone(880,t+.12,.3)}catch(e){}}
+function confetti(){for(var i=0;i<46;i++){var e=document.createElement('i');e.className='cf';e.style.left=rnd(100)+'vw';e.style.background=['#d4af37','#f6e3a1','#34457f','#7d2f45','#fff'][rnd(5)];e.style.animationDelay=(Math.random()*.8)+'s';document.body.appendChild(e);setTimeout(e.remove.bind(e),3600)}}
+function burst(x,y,n){for(var i=0;i<(n||12);i++){var e=document.createElement('i'),a=Math.random()*6.28,d=40+Math.random()*60;e.className='sp';e.style.left=x+'px';e.style.top=y+'px';e.style.setProperty('--dx',Math.cos(a)*d+'px');e.style.setProperty('--dy',Math.sin(a)*d+'px');document.body.appendChild(e);setTimeout(e.remove.bind(e),800)}}
+function burstAt(el){var r=el.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2)}
+function hit(){document.body.classList.add('hit');setTimeout(function(){document.body.classList.remove('hit')},400)}
+function fanfare(){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();ac.resume();var t=ac.currentTime+.05;[60,64,67,72].forEach(function(m,i){tone(440*Math.pow(2,(m-69)/12),t+i*.14,.5)})}catch(e){}}
+function slash(el){var r=el.getBoundingClientRect(),e=document.createElement('i');e.className='sl';e.style.left=(r.left+r.width/2)+'px';e.style.top=(r.top+r.height/2)+'px';document.body.appendChild(e);setTimeout(e.remove.bind(e),500)}
+var RANKS=[[0,'ทหารฝึกหัด'],[10,'อัศวินฝึกหัด'],[30,'อัศวิน'],[70,'อัศวินผู้กล้า'],[150,'อัศวินแห่งราชสำนัก']];
+function rankIdx(x){var i=0;RANKS.forEach(function(r,k){if(x>=r[0])i=k});return i}
+function touchDay(){var d=new Date(),f=function(x){return x.getFullYear()+'-'+(x.getMonth()+1)+'-'+x.getDate()},t=f(d);
+ if(ST.last===t)return;var y=new Date(d.getFullYear(),d.getMonth(),d.getDate()-1);
+ ST.streak=ST.last===f(y)?(ST.streak||0)+1:1;ST.last=t;ST.maxStreak=Math.max(ST.maxStreak||0,ST.streak)}
+var RI=['🪖','🛡️','⚔️','🏰','👑'];
+function renderRank(){var x=ST.xp||0,i=rankIdx(x),nx=RANKS[i+1],pc=nx?Math.round((x-RANKS[i][0])/(nx[0]-RANKS[i][0])*100):100;
+ $('rank').innerHTML='<div class="emb">'+RI[i]+'</div><div class="rk"><div class="rn"><b>'+RANKS[i][1]+'</b><span>LV '+(i+1)+'</span></div><div class="bar"><i style="width:'+pc+'%"></i></div><small>XP '+x+(nx?' / '+nx[0]:' · สูงสุด')+'</small></div>'+((ST.streak||0)>0?'<div class="stk">🔥<b>'+ST.streak+'</b></div>':'')}
+function addXp(n){var o=rankIdx(ST.xp||0);touchDay();ST.xp=(ST.xp||0)+n;save('kcStats',ST);var k=rankIdx(ST.xp);if(k>o){say('เลื่อนยศ! '+RANKS[k][1]);fanfare()}renderRank()}
+function hp(){return'❤️'.repeat(Q.hp)+'🖤'.repeat(5-Q.hp)}
+function show(){
+ var ks=accsAt(sel.p),a=ks[Math.min(sel.alt,ks.length-1)],r=sel.r,n=nm(a,r),ph=load('kcPhrase'),i;
+ document.querySelectorAll('.seg').forEach(function(g){var gp=+g.dataset.p,same=g.dataset.r===r,on=gp===sel.p&&same;
+  g.classList.toggle('on',on);
+  g.classList.toggle('nb',!on&&(same?(mod(gp-sel.p)===1||mod(sel.p-gp)===1):gp===sel.p))});
+ $('mid').textContent=n;
+ var chs='',ix=LET.indexOf(n[0]),rm=r==='maj'?['I','IV','V']:['i','iv','V'];
+ [[0,0],[3,5],[4,7]].forEach(function(d,j){var L=LET[(ix+d[0])%7],sg=a>0&&SH.slice(0,a).indexOf(L)>=0?'♯':a<0&&FL.slice(0,-a).indexOf(L)>=0?'♭':'',mn=r==='min'&&j<2;chs+='<button data-o="'+d[1]+'" data-m="'+(mn?1:0)+'">'+rm[j]+' '+L+sg+(mn?'m':'')+'</button>'});
+ var list=[];for(i=0;i<Math.abs(a);i++)list.push(a>0?SH[i]+'♯':FL[i]+'♭');
+ $('info').innerHTML='<h2>'+n+' <small>'+(r==='maj'?'เมเจอร์':'ไมเนอร์')+'</small></h2>'+
+  '<p class="acc">'+lab(a)+(list.length?' : '+list.join(' '):'')+'</p>'+staff(a)+
+  '<p class="phrase">'+(a>0?ph.s||'':a<0?ph.f||'':'')+'</p>'+
+  '<p>คู่ขนาน: '+nm(a,r==='maj'?'min':'maj')+'</p>'+
+  '<p><small>ช่องเส้นประทองบนวงจร = กุญแจใกล้เคียง (ซ้าย/ขวา และคู่ขนาน)</small></p>'+
+  '<p class="row"><button id="pl" class="go">▶ ฟังบันไดเสียง</button></p>'+'<h3>คอร์ดหลัก (กดเพื่อฟัง)</h3><div class="chords">'+chs+'</div>'+
+  (ks.length>1?'<p><small>แตะช่องเดิมซ้ำเพื่อสลับชื่อ '+ks.map(function(x){return nm(x,r)}).join(' / ')+'</small></p>':'');
+ $('pl').onclick=function(){play(n,r)};
+ document.querySelectorAll('.chords button').forEach(function(b){b.onclick=function(){var o=rootOf(n)+ +b.dataset.o,m=b.dataset.m==='1';chord([o,o+(m?3:4),o+7])}})}
+
+function pickKey(e){
+ if(Bd)return place(e);
+ var g=e.target.closest('.seg');if(!g)return;
+ var p=+g.dataset.p,r=g.dataset.r;
+ sel.alt=(sel.p===p&&sel.r===r)?sel.alt+1:0;
+ if(sel.alt>=accsAt(p).length)sel.alt=0;
+ sel.p=p;sel.r=r;show();var ks=accsAt(p),n=nm(ks[Math.min(sel.alt,ks.length-1)],r);ping(n);ST.seen[n]=1;save('kcStats',ST);chk();burstAt(g)}
+$('circle').addEventListener('click',pickKey);
+$('circle').addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();pickKey(e)}});
+
+$('pSave').onclick=function(){save('kcPhrase',{s:$('pS').value.trim(),f:$('pF').value.trim()});$('pMsg').textContent='บันทึกแล้ว';show()};
+(function(){var p=load('kcPhrase');$('pS').value=p.s||'';$('pF').value=p.f||''})();
+
+var SET=Object.assign({th:'auto',cl:'g',vol:80},load('kcSet')),ST=Object.assign({g:0,seen:{},modes:{},best:{}},load('kcStats')),V=SET.vol/100,M='explore',Q={},Bd=null,TM=0;
+function theme(){var c=document.documentElement.classList;c.toggle('dk',SET.th==='dark');c.toggle('lt',SET.th==='light')}
+function say(t){var e=$('bt');e.textContent=t;e.hidden=false;clearTimeout(say.t);say.t=setTimeout(function(){e.hidden=true},3000)}
+var BG=[
+['เริ่มต้น','ตอบ 10 ข้อให้จบหนึ่งรอบ',function(){return ST.g>=1}],
+['เต็มสิบ','ได้ 10 จาก 10 ในโหมดตอบ 10 ข้อ',function(){return ST.perfect}],
+['นักแข่ง','ตอบถูก 12 ข้อขึ้นไปในโหมดแข่งเวลา',function(){return(ST.best.race||0)>=12}],
+['วงจรไร้ที่ติ','เติมวงจรโดยไม่ผิดเลย',function(){return ST.clean}],
+['นักสำรวจ','เปิดดูกุญแจเสียง 8 กุญแจ',function(){return Object.keys(ST.seen).length>=8}],
+['ครบทุกโหมด','เล่นโหมดตอบ แข่งเวลา และเติมวงจร',function(){return ST.modes.quiz&&ST.modes.race&&ST.modes.build}],
+['ระดับยาก','ได้ 8 ข้อขึ้นไปในระดับยากของโหมดตอบ',function(){return ST.hard}],
+['ไฟไม่ดับ','เล่นต่อเนื่อง 3 วัน',function(){return(ST.maxStreak||0)>=3}]];
+function renderBadges(){var o=load('kcBadge'),n=0;BG.forEach(function(b,i){if(o[i])n++});
+ $('badges').innerHTML='<h2>ห้องสมบัติ <small>เหรียญ '+n+' / '+BG.length+'</small></h2><div class="medals">'+BG.map(function(b,i){return'<div class="medal'+(o[i]?' got':'')+'"><span>'+(o[i]?'🏅':'🔒')+'</span><b>'+b[0]+'</b><small>'+b[1]+'</small></div>'}).join('')+'</div>'}
+function chk(){var o=load('kcBadge'),n=0;BG.forEach(function(b,i){if(!o[i]&&b[2]()){o[i]=1;n++;say('ได้เหรียญ: '+b[0])}});if(n)save('kcBadge',o);renderBadges()}
+
+function setMode(m){M=m;clearInterval(TM);Bd=null;
+ $('circle').classList.remove('blank');$('info').style.display='';
+ document.querySelectorAll('.seg').forEach(function(g){g.classList.remove('placed')});
+ var scr=(m==='explore'||m==='build')?'explore':(m==='quiz'||m==='race')?'quiz':m;
+ ['menu','explore','quiz','treasure','settings'].forEach(function(s){$(s).hidden=s!==scr});
+ document.body.dataset.screen=scr;
+ if(scr==='explore'){var cc=$('circle');cc.classList.remove('intro');void cc.offsetWidth;cc.classList.add('intro');clearTimeout(setMode.it);setMode.it=setTimeout(function(){cc.classList.remove('intro')},1800)}
+ if(m==='explore'){show();daily()}else if(m==='build')startBuild();else if(m==='quiz'||m==='race')menu(m);else if(m==='menu'){renderMenu();dailyQ()}else if(m==='treasure')renderBadges();
+ window.scrollTo(0,0)}
+function menu(m){
+ $('qBox').className='card';
+ $('qBox').innerHTML='<h2>'+(m==='quiz'?'ตอบ 10 ข้อ':'แข่งเวลา')+': เลือกระดับ</h2><div class="opts lv"><button><span class="st">★</span>ง่าย</button><button><span class="st">★★</span>กลาง</button><button><span class="st">★★★</span>ยาก</button></div><p><small>'+(m==='race'?'ตอบถูกได้เวลาเพิ่ม 4 วินาที ตอบผิดเสียเวลา 3 วินาที กดหยุดชั่วคราวได้ · ':'')+'ยิ่งยากยิ่งมีกุญแจและคำถามหลากหลาย</small></p>';
+ document.querySelectorAll('#qBox .opts button').forEach(function(b,i){b.onclick=function(){begin(m,i)}})}
+function begin(m,l){Q={m:m,L:l,i:0,s:0,tl:45,pause:0,hp:5,weak:[]};
+ if(m==='race')TM=setInterval(function(){if(Q.pause)return;Q.tl--;upd();if(Q.tl<=0)finish()},1000);
+ ask()}
+function upd(){var e=$('tl');if(e)e.textContent='เหลือ '+Math.max(0,Q.tl)+' วินาที · ถูก '+Q.s+' ข้อ'+(Q.k>1?' · ⚔ ×'+Q.k:'')+' · '+hp()}
+function ask(){
+ var t=Q.i%3,R=[3,5,7][Q.L],a=rnd(2*R+1)-R,r=Q.L>0&&rnd(2)?'min':'maj',o=[a],x,oth=r==='maj'?'min':'maj';
+ if(t===1&&Q.L<2)r='maj';
+ while(o.length<4){x=rnd(2*R+1)-R;if(o.indexOf(x)<0)o.push(x)}
+ o.sort(function(){return Math.random()-.5});
+ Q.a=a;Q.t=t;Q.r=r;
+ var hd=Q.m==='quiz'?'<div class="bar"><i style="width:'+(Q.i*10)+'%"></i></div><p><small>ข้อ '+(Q.i+1)+' จาก 10 · คะแนน '+Q.s+(Q.k>1?' · ⚔ คอมโบ ×'+Q.k:'')+' · '+hp()+'</small></p>':'<p class="row"><b id="tl"></b><button id="ps">หยุดชั่วคราว</button></p>';
+ $('qBox').className='card';
+ $('qBox').innerHTML=hd+(t===0?'<h2>กุญแจ '+nm(a,r)+' มีเครื่องหมายกี่ตัว?</h2>':t===2?'<h2>คู่ขนานของ '+nm(a,r)+' ('+(r==='maj'?'เมเจอร์':'ไมเนอร์')+') คืออะไร?</h2>':'<h2>กุญแจ'+(r==='maj'?'เมเจอร์':'ไมเนอร์')+'อะไร?</h2>'+staff(a))+
+  '<div class="opts">'+o.map(function(v){return'<button data-v="'+v+'">'+(t===0?lab(v):t===2?nm(v,oth):nm(v,r))+'</button>'}).join('')+'</div><div id="nx"></div>';
+ document.querySelectorAll('.opts button').forEach(function(b){b.onclick=function(){answer(b)}});
+ if(Q.m==='race'){upd();$('ps').onclick=function(){Q.pause=!Q.pause;$('qBox').className='card'+(Q.pause?' ps':'');this.textContent=Q.pause?'เล่นต่อ':'หยุดชั่วคราว'}}}
+function answer(b){
+ if(Q.pause)return;
+ var ok=+b.dataset.v===Q.a;Q.k=ok?(Q.k||0)+1:0;if(ok){Q.s++;burstAt(b);slash(b);addXp(1)}else{Q.weak.push([Q.a,Q.r]);Q.hp--;hit()}sfx(ok);
+ document.querySelectorAll('.opts button').forEach(function(x){x.disabled=true;if(+x.dataset.v===Q.a)x.className='ok'});
+ if(!ok)b.className='bad';
+ Q.i++;
+ if(Q.m==='race'){Q.tl+=ok?4:-3;upd();setTimeout(function(){if(Q.tl<=0||Q.hp<=0)finish();else if(M==='race')ask()},500);return}
+ $('nx').innerHTML='<p>'+(ok?'ถูกต้อง':'ยังไม่ถูก')+'</p><button class="go" id="nb">'+(Q.i<10&&Q.hp>0?'ข้อต่อไป':'ดูผล')+'</button>';
+ $('nb').onclick=function(){Q.i<10&&Q.hp>0?ask():finish()}}
+
+function startBuild(){
+ Bd={t:[],i:0};for(var p=1;p<12;p++)Bd.t.push(p);Bd.t.sort(function(){return Math.random()-.5});
+ Q={m:'build',mis:0,weak:[]};
+ $('circle').classList.add('blank');$('info').style.display='none';
+ document.querySelectorAll('.seg').forEach(function(g){g.classList.toggle('placed',g.dataset.p==='0'&&g.dataset.r==='maj')});
+ $('mid').textContent='';bprompt()}
+function bprompt(){var a=accsAt(Bd.t[Bd.i])[0];$('daily').innerHTML='<span>แตะช่องของ <b>'+nm(a,'maj')+'</b> ('+lab(a)+') บนวงนอก · เหลืออีก '+(11-Bd.i)+' ช่อง</span>'}
+function place(e){
+ var g=e.target.closest('.seg');if(!g||g.dataset.r!=='maj'||g.classList.contains('placed'))return;
+ var p=Bd.t[Bd.i];
+ if(+g.dataset.p!==p){Q.mis++;Q.weak.push([accsAt(p)[0],'maj']);sfx(false);hit();say('ยังไม่ใช่ ลองใหม่');return}
+ sfx(true);burstAt(g);slash(g);addXp(1);g.classList.add('placed');Bd.i++;
+ if(Bd.i>=11)setTimeout(finish,400);else bprompt()}
+
+function finish(){
+ if(Q.done)return;Q.done=1;clearInterval(TM);Bd=null;
+ $('circle').classList.remove('blank');$('info').style.display='';$('explore').hidden=true;$('quiz').hidden=false;
+ var m=Q.m,b=ST.best,txt,good;
+ ST.modes[m]=1;
+ if(m==='quiz'){ST.g++;if(Q.s===10)ST.perfect=1;if(Q.L===2&&Q.s>=8)ST.hard=1;b.quiz=Math.max(b.quiz||0,Q.s);txt=Q.s+' / 10';good=Q.s>=8}
+ else if(m==='race'){b.race=Math.max(b.race||0,Q.s);txt=Q.s+' ข้อ';good=Q.s>=12}
+ else{b.build=b.build==null?Q.mis:Math.min(b.build,Q.mis);if(!Q.mis)ST.clean=1;txt='ผิด '+Q.mis+' ครั้ง';good=Q.mis<=2}
+ save('kcStats',ST);chk();if(good){confetti();fanfare()}
+ var seen={},wk=Q.weak.filter(function(w){var k=nm(w[0],w[1]);return seen[k]?0:(seen[k]=1)}).slice(0,5);
+ $('qBox').className='card';
+ $('qBox').innerHTML='<h2>สรุปผล '+(good?'👑 ยอดเยี่ยม!':Q.hp<=0?'🛡 พลังหมด ลองใหม่อีกครั้ง':'🎼 ฝึกอีกนิด')+'</h2><p class="score">'+txt+'</p>'+
+  '<p>ดีที่สุด: '+(m==='quiz'?b.quiz+' / 10':m==='race'?b.race+' ข้อ':'ผิด '+b.build+' ครั้ง')+'</p>'+
+  (wk.length?'<h3>กุญแจที่ควรทบทวน (แตะเพื่อดูในโหมดสำรวจ)</h3><p class="row">'+wk.map(function(w,i){return'<button data-i="'+i+'">'+nm(w[0],w[1])+'</button>'}).join('')+'</p>':'')+
+  '<p class="row"><button id="cp" class="go">คัดลอกผลการเล่น</button><button id="again">เล่นอีกครั้ง</button><button id="tm">☰ เมนูหลัก</button></p><p id="toast"></p>';
+ document.querySelectorAll('#qBox button[data-i]').forEach(function(x){x.onclick=function(){var w=wk[+x.dataset.i];setMode('explore');sel={p:mod(w[0]),r:w[1],alt:accsAt(mod(w[0])).indexOf(w[0])};show()}});
+ $('again').onclick=function(){setMode(m)};$('tm').onclick=function(){setMode('menu')};
+ $('cp').onclick=function(){var t='วงจรคู่ห้า ('+({quiz:'ตอบ 10 ข้อ',race:'แข่งเวลา',build:'เติมวงจร'})[m]+'): '+txt;
+  try{navigator.clipboard.writeText(t).then(function(){$('toast').textContent='คัดลอกแล้ว'},function(){$('toast').textContent=t})}catch(e){$('toast').textContent=t}}}
+
+$('clS').value=SET.cl;$('vol').value=SET.vol;theme();
+$('clS').onchange=function(){SET.cl=this.value;save('kcSet',SET);show()};
+$('vol').oninput=function(){SET.vol=+this.value;V=SET.vol/100;save('kcSet',SET)};
+$('rst').onclick=function(){var b=this;
+ if(!b.d){b.d=1;b.textContent='กดอีกครั้งเพื่อยืนยัน';setTimeout(function(){b.d=0;b.textContent='ล้างสถิติและเหรียญ'},4000);return}
+ b.d=0;b.textContent='ล้างสถิติและเหรียญ';ST={g:0,seen:{},modes:{},best:{}};save('kcStats',ST);save('kcBadge',{});renderBadges();renderRank();say('ล้างแล้ว')};
+function daily(){var d=new Date(),a=(d.getFullYear()*372+d.getMonth()*31+d.getDate())%15-7,p=mod(a),al=accsAt(p).indexOf(a);
+ $('daily').innerHTML='<span>กุญแจประจำวันนี้ <b>'+nm(a,'maj')+'</b> ('+lab(a)+')</span><button id="dl" class="go">เปิดดู</button>';
+ $('dl').onclick=function(){sel={p:p,r:'maj',alt:al};show()}}
+(function(){var c=$('circle'),box=c.parentNode,rm=window.matchMedia('(prefers-reduced-motion:reduce)');
+ function set(rx,ry){c.style.setProperty('--rx',rx+'deg');c.style.setProperty('--ry',ry+'deg')}
+ box.addEventListener('pointermove',function(e){if(rm.matches||e.pointerType==='touch')return;var r=box.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  c.classList.add('tilting');set((16-y*22).toFixed(1),(x*22).toFixed(1))});
+ box.addEventListener('pointerleave',function(){c.classList.remove('tilting');set(matchMedia('(pointer:coarse)').matches?10:16,0)})})();
+build();show();daily();renderBadges();renderRank();
+(function(){var h=$('title'),ch=['♪','♫','♩','♬'],c=$('circle'),i;
+ for(i=0;i<10;i++){var s=document.createElement('span');s.className='note';s.textContent=ch[i%4];s.style.left=(4+i*9.6)+'%';s.style.setProperty('--d',(5+Math.random()*5)+'s');s.style.animationDelay=(-Math.random()*8)+'s';s.style.fontSize=(1+Math.random()*1.2)+'rem';h.appendChild(s)}
+ document.querySelectorAll('.seg path').forEach(function(p,k){p.style.animationDelay=(k*0.035)+'s'});
+ })();
+
+function dkey(){var d=new Date();return(d.getFullYear()*372+d.getMonth()*31+d.getDate())%15-7}
+function dailyQ(){var a=dkey(),today=new Date().toDateString(),done=ST.dqDay===today;
+ $('dq').innerHTML='<div class="qi">'+(done?'✅':'📜')+'</div><div><b>ภารกิจประจำวัน'+(done?' · สำเร็จแล้ว':' · รางวัล +3 XP')+'</b><span>ไปเยือนกุญแจ '+nm(a,'maj')+' ('+lab(a)+')</span></div><button class="go" id="dqb">'+(done?'ดูอีกครั้ง':'รับภารกิจ')+'</button>';
+ $('dqb').onclick=function(){setMode('explore');var p=mod(a);sel={p:p,r:'maj',alt:accsAt(p).indexOf(a)};show();
+  if(ST.dqDay!==today){ST.dqDay=today;save('kcStats',ST);addXp(3);say('ภารกิจสำเร็จ! +3 XP')}}}
+function renderMenu(){var b=ST.best||{},o=load('kcBadge'),n=0;BG.forEach(function(x,i){if(o[i])n++});
+ var T=[['explore','📖','สำรวจ','ห้องฝึก เรียนรู้วงจรและฟังเสียง','TRAINING',''],
+  ['quiz','⚔️','ศึกปริศนา','ตอบ 10 ข้อ ด้วยพลังชีวิต 5 ดวง','BATTLE',b.quiz!=null?'สถิติ '+b.quiz+' / 10':'ยังไม่เคยเล่น'],
+  ['race','⏱️','ประลองเวลา','ตอบถูกได้เวลาเพิ่ม ตอบผิดเสียเวลา','TIME ATTACK',b.race!=null?'สถิติ '+b.race+' ข้อ':'ยังไม่เคยเล่น'],
+  ['build','🧩','ปริศนาวงจร','เติมชื่อกุญแจลงบนวงจรเปล่า','PUZZLE',b.build!=null?'ผิดน้อยสุด '+b.build+' ครั้ง':'ยังไม่เคยเล่น'],
+  ['treasure','🏅','ห้องสมบัติ','เหรียญรางวัลและวลีช่วยจำ','COLLECTION','เหรียญ '+n+' / '+BG.length],
+  ['settings','⚙️','ตั้งค่า','ระดับเสียง กุญแจประจำหลัก','OPTIONS','']];
+ $('tiles').innerHTML=T.map(function(t,i){return'<button class="tile t-'+t[0]+'" data-go="'+t[0]+'" style="--i:'+i+'"><span class="tg">'+t[4]+'</span><span class="ic">'+t[1]+'</span><b>'+t[2]+'</b><em>'+t[3]+'</em><small>'+t[5]+'</small></button>'}).join('');
+ document.querySelectorAll('#tiles .tile').forEach(function(t){t.onclick=function(){sfx(true);setMode(t.dataset.go)}})}
+$('home').onclick=function(){setMode('menu')};
+$('startBtn').onclick=function(){fanfare();$('title').classList.add('out');setTimeout(function(){$('title').style.display='none'},800);document.body.dataset.screen='menu'};
+setMode('menu');document.body.dataset.screen='title';
+</script>
+</body>
+</html>
